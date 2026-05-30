@@ -9,6 +9,18 @@
 <body>
 <main class="shell">
     <section class="panel">
+        <div id="userBar" class="user-bar" hidden>
+            <span id="userGreeting" class="user-greeting"></span>
+            <div class="user-menu">
+                <button id="userMenuButton" class="avatar-button" type="button" aria-haspopup="true" aria-expanded="false">
+                    <span id="userAvatar" class="user-avatar"></span>
+                </button>
+                <div id="userDropdown" class="user-dropdown" hidden>
+                    <button id="logoutButton" class="dropdown-item" type="button">Wyloguj</button>
+                </div>
+            </div>
+        </div>
+
         <div class="heading">
             <p class="eyebrow">Spring Boot 4</p>
             <h1>Upload dwoch plikow</h1>
@@ -56,6 +68,7 @@
     </section>
 </main>
 
+<script src="http://localhost:8085/js/keycloak.js"></script>
 <script src="/app.js"></script>
 </body>
 </html>

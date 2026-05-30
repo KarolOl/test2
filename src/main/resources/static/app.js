@@ -7,11 +7,19 @@ const resultValue = document.querySelector("#resultValue");
 const base64Value = document.querySelector("#base64Value");
 const downloadPdfLink = document.querySelector("#downloadPdfLink");
 const errorBox = document.querySelector("#error");
+const userBar = document.querySelector("#userBar");
+const userGreeting = document.querySelector("#userGreeting");
+const userMenuButton = document.querySelector("#userMenuButton");
+const userAvatar = document.querySelector("#userAvatar");
+const userDropdown = document.querySelector("#userDropdown");
+const logoutButton = document.querySelector("#logoutButton");
 
 let pdfObjectUrl;
+let keycloak;
 
 setupDropzone("firstFile", "firstFileName");
 setupDropzone("secondFile", "secondFileName");
+initKeycloak();
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -26,8 +34,13 @@ form.addEventListener("submit", async (event) => {
     revokePdfObjectUrl();
 
     try {
+        await refreshToken();
+
         const response = await fetch("/api/files/process", {
             method: "POST",
+            headers: {
+                Authorization: `Bearer ${keycloak.token}`
+            },
             body: formData
         });
 
@@ -51,6 +64,96 @@ form.addEventListener("submit", async (event) => {
 });
 
 window.addEventListener("beforeunload", revokePdfObjectUrl);
+document.addEventListener("click", closeUserDropdownOnOutsideClick);
+userMenuButton.addEventListener("click", toggleUserDropdown);
+logoutButton.addEventListener("click", () => keycloak.logout());
+
+async function initKeycloak() {
+    setFormEnabled(false);
+
+    if (typeof Keycloak === "undefined") {
+        showAuthError("Nie udalo sie zaladowac adaptera Keycloak z localhost:8085.");
+        return;
+    }
+
+    keycloak = new Keycloak({
+        url: "http://localhost:8085",
+        realm: "test",
+        clientId: "test-public"
+    });
+
+    try {
+        await keycloak.init({
+            onLoad: "login-required",
+            checkLoginIframe: false
+        });
+
+        renderAuthenticatedUser();
+        setFormEnabled(true);
+    } catch (error) {
+        showAuthError(`Nie udalo sie zalogowac przez Keycloak: ${error.message ?? error}`);
+    }
+}
+
+async function refreshToken() {
+    try {
+        await keycloak.updateToken(30);
+    } catch (error) {
+        await keycloak.login();
+        throw error;
+    }
+}
+
+function renderAuthenticatedUser() {
+    const preferredName =  keycloak.tokenParsed?.name
+        ?? keycloak.tokenParsed?.email
+        ?? keycloak.tokenParsed?.preferred_username
+        ?? "zalogowany uzytkownik";
+
+    userGreeting.innerHTML = `Cześć<br><strong>${preferredName}</strong>`;
+    userAvatar.textContent = preferredName.trim().charAt(0).toUpperCase();
+    userAvatar.style.backgroundColor = getUserColor(preferredName);
+    userBar.hidden = false;
+}
+
+function toggleUserDropdown(event) {
+    event.stopPropagation();
+
+    const isOpen = userDropdown.hidden;
+    userDropdown.hidden = !isOpen;
+    userMenuButton.setAttribute("aria-expanded", String(isOpen));
+}
+
+function closeUserDropdownOnOutsideClick(event) {
+    if (userBar.hidden || userDropdown.hidden || userMenuButton.contains(event.target) || userDropdown.contains(event.target)) {
+        return;
+    }
+
+    userDropdown.hidden = true;
+    userMenuButton.setAttribute("aria-expanded", "false");
+}
+
+function getUserColor(name) {
+    let hash = 0;
+
+    for (let index = 0; index < name.length; index += 1) {
+        hash = ((hash << 5) - hash) + name.charCodeAt(index);
+        hash |= 0;
+    }
+
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 82%, 48%)`;
+}
+
+function showAuthError(message) {
+    errorBox.textContent = message;
+    errorBox.hidden = false;
+}
+
+function setFormEnabled(isEnabled) {
+    submitButton.disabled = !isEnabled;
+    submitLabel.textContent = isEnabled ? "Wyslij" : "Logowanie...";
+}
 
 function setupDropzone(inputId, fileNameId) {
     const input = document.querySelector(`#${inputId}`);

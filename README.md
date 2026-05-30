@@ -36,3 +36,15 @@ Odpowiedz:
 ```
 
 W dummy implementacji `pdfFileInBase64` jest Base64 z pierwszego przeslanego pliku.
+
+## Endpoint TSL
+
+```http
+GET /api/tsl/revocation-endpoints
+```
+
+Endpoint pobiera `https://ec.europa.eu/tools/lotl/eu-lotl.xml`, wybiera polska liste TSL
+(`SchemeTerritory = PL`) z lokacja konczaca sie na `.xml`, a potem wypisuje w konsoli adresy
+CRL oraz OCSP znalezione w `ServiceSupplyPoint` uslug CRL/OCSP oraz w rozszerzeniach certyfikatow
+`X509Certificate`. Uwzgledniane sa rowniez historyczne wpisy uslug (`ServiceHistoryInstance`).
+Odpowiedz endpointu zawiera te same dane w JSON.
