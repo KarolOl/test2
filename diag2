@@ -1,0 +1,16 @@
+flowchart LR
+    W[Windows: zalogowany użytkownik]
+    B[Przeglądarka]
+    A[Angular]
+    K[Keycloak]
+    D[Active Directory]
+    J[Java API]
+
+    W --> B
+    B --> A
+    A -->|Przekierowanie OIDC| K
+    B <-->|SPNEGO / Kerberos| K
+    B <-->|Uzyskanie biletu z KDC| D
+    K -->|LDAP: profil i grupy| D
+    K -->|Kod autoryzacyjny przez przeglądarkę| A
+    A -->|Access token| J
