@@ -1,0 +1,20 @@
+sequenceDiagram
+    actor U as Użytkownik
+    participant B as Przeglądarka
+    participant A as Aplikacja
+    participant D as AD / KDC
+    participant K as Keycloak
+
+    Note over U,D: Sesja Windows ma bilet TGT
+    U->>A: Otwiera aplikację
+    A->>B: Przekierowanie do Keycloak
+    B->>K: Żądanie logowania OIDC
+    K-->>B: 401 + WWW-Authenticate: Negotiate
+    B->>D: Żądanie biletu HTTP/sso.corp.example
+    D-->>B: Bilet usługi
+    B->>K: Authorization: Negotiate ...
+    K->>K: Weryfikacja przy użyciu keytab
+    K->>D: LDAP: wyszukanie użytkownika
+    D-->>K: Profil użytkownika
+    K-->>B: Powrót do aplikacji z kodem OIDC
+    Note over B,A: Kod wymieniany na tokeny, np. z PKCE
