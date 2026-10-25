@@ -41,7 +41,7 @@ export class App implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     try {
-      const user = await this.authentication.initialize();
+      const user = await this.authentication.loadUser();
       this.userName.set(user.displayName);
     } catch (error) {
       this.errorMessage.set(
@@ -63,8 +63,7 @@ export class App implements OnInit, OnDestroy {
     this.clearResponse();
 
     try {
-      const token = await this.authentication.getValidToken();
-      const response = await this.fileProcessing.process(firstFile, secondFile, token);
+      const response = await this.fileProcessing.process(firstFile, secondFile);
       this.result.set(response);
       this.createPdfDownload(response.pdfFileInBase64);
     } catch (error) {

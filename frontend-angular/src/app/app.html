@@ -1,6 +1,6 @@
 <app-loading-spinner
   [active]="isInitializing() || loading.isLoading()"
-  [message]="isInitializing() ? 'Przekierowanie na stronę logowania...' : 'Ładowanie danych...'"
+  [message]="isInitializing() ? 'Wczytywanie danych użytkownika...' : 'Ładowanie danych...'"
 />
 @if (authentication.isAuthenticated()) {
   <main class="container min-vh-100 d-flex align-items-center py-3">

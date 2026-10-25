@@ -1,15 +1,12 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
+import { createAppConfig } from './app/app.config';
 import { App } from './app/app';
-import { APP_SETTINGS, loadAppSettings } from './app/config/app-settings';
+import { loadAppSettings } from './app/config/app-settings';
 
 async function start(): Promise<void> {
   const settings = await loadAppSettings();
   document.title = settings.appTitle;
-  await bootstrapApplication(App, {
-    ...appConfig,
-    providers: [...appConfig.providers, { provide: APP_SETTINGS, useValue: settings }],
-  });
+  await bootstrapApplication(App, createAppConfig(settings));
 }
 
 void start().catch((error: unknown) => {

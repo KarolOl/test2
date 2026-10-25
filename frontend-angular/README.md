@@ -93,7 +93,7 @@ nginx generuje publiczny `settings.json` przy każdym starcie kontenera i wyłą
 
 ## Struktura komponentów
 
-- `App` — logowanie, wysyłka do API i cykl życia adresu pobierania PDF.
+- `App` — wczytanie profilu zalogowanego użytkownika, wysyłka do API i cykl życia adresu pobierania PDF.
 - `UserMenu` — avatar i menu użytkownika.
 - `FileUploadForm` — wybór wymaganego pierwszego pliku i opcjonalnego drugiego oraz walidacja formularza.
 - `FileDropzone` — wielokrotnie używane pole wyboru pliku z drag-and-drop.
@@ -112,6 +112,12 @@ Frontend Angular jest udostępniany na licencji Apache License 2.0 (`Apache-2.0`
 
 ## Uwierzytelnianie i ładowanie
 
-`AuthenticationService.isAuthenticated` jest sygnałem tylko do odczytu; zawartość `main` jest renderowana wyłącznie dla zalogowanych użytkowników. Błędy logowania są wyświetlane poza chronioną zawartością.
+Integracja korzysta z `keycloak-angular` 22 i adaptera `keycloak-js`. Po pobraniu settings funkcja `createAppConfig` rejestruje `provideKeycloak` z `initOptions` (`login-required`, `checkLoginIframe: false`). Biblioteka inicjalizuje klienta podczas startu Angulara; aplikacja nie tworzy własnej instancji Keycloak i nie wywołuje ręcznie `init()`.
 
-`loadingInterceptor` jest zarejestrowany globalnie dla `HttpClient`. `LoadingService` zlicza aktywne subskrypcje żądań: spinner pozostaje widoczny do zakończenia ostatniej z nich, również przy błędach i anulowaniu. Logowanie przez `keycloak-js` ma osobny stan inicjalizacji, ponieważ nie korzysta z Angularowego `HttpClient`. `isSubmitting` blokuje ponowne wysłanie formularza, ale nie steruje spinnerem.
+`includeBearerTokenInterceptor` dodaje nagłówek `Authorization: Bearer ...` tylko do skonfigurowanego `apiBaseUrl` i jego podścieżek. Dla względnego `/api` obsługuje też pełne adresy z tym samym originem. Dopasowanie zachowuje granicę ścieżki: np. `/api-other` i adresy innych serwerów nie otrzymują tokenu. Interceptor biblioteki sprawdza i w razie potrzeby odświeża token przed żądaniem; formularz i `FileProcessingService` nie pobierają ani nie przekazują tokenu ręcznie.
+
+`withAutoRefreshToken`, `AutoRefreshTokenService` i `UserActivityService` automatycznie odnawiają token przy kolejnych zdarzeniach jego wygaśnięcia, również bez wywołań API i interakcji użytkownika. `sessionTimeout: Number.POSITIVE_INFINITY` wyłącza limit bezczynności po stronie interfejsu w używanej wersji biblioteki. `onInactivityTimeout: 'logout'` pozostaje obsługą błędu automatycznego odświeżenia. Nadal obowiązują limity sesji skonfigurowane na serwerze Keycloak; uśpienie przeglądarki może opóźnić odświeżanie. Nie ma własnego interwału ani ręcznego wywołania `updateToken()` w kodzie aplikacji.
+
+`AuthenticationService` wstrzykuje wspólną instancję Keycloak i `KEYCLOAK_EVENT_SIGNAL`. Udostępnia wyliczany sygnał `isAuthenticated`, pobiera profil (z awaryjnym odczytem claims tokenu) i obsługuje wylogowanie. Zawartość `main` jest renderowana wyłącznie dla zalogowanych użytkowników. Błędy logowania są wyświetlane poza chronioną zawartością. Serwis nie nadpisuje callbacków adaptera, z których korzysta biblioteka.
+
+`loadingInterceptor` jest zarejestrowany przed interceptorem Bearer. `LoadingService` zlicza aktywne subskrypcje żądań: spinner pozostaje widoczny do zakończenia ostatniej z nich, również przy oczekiwaniu na odświeżenie tokenu, błędach i anulowaniu. Inicjalizacja Keycloak odbywa się przed renderowaniem Angulara; osobny `isInitializing` dotyczy pobierania profilu użytkownika po zalogowaniu. `isSubmitting` blokuje ponowne wysłanie formularza, ale nie steruje spinnerem.

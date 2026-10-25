@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { FileProcessingResponse } from '../models/file-processing-response';
@@ -9,11 +9,7 @@ export class FileProcessingService {
   private readonly settings = inject(APP_SETTINGS);
   constructor(private readonly http: HttpClient) {}
 
-  process(
-    firstFile: File,
-    secondFile: File | null,
-    token: string,
-  ): Promise<FileProcessingResponse> {
+  process(firstFile: File, secondFile: File | null): Promise<FileProcessingResponse> {
     const payload = new FormData();
     payload.append('firstFile', firstFile);
     if (secondFile) {
@@ -21,9 +17,7 @@ export class FileProcessingService {
     }
 
     return firstValueFrom(
-      this.http.post<FileProcessingResponse>(`${this.settings.apiBaseUrl}/files/process`, payload, {
-        headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
-      }),
+      this.http.post<FileProcessingResponse>(`${this.settings.apiBaseUrl}/files/process`, payload),
     );
   }
 }
