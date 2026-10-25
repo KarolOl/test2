@@ -77,8 +77,22 @@ function isProcessingJsonResult(value: unknown): value is ProcessingJsonResult {
     value['records'].every(
       (record: unknown) =>
         isObject(record) &&
-        ['id', 'status', 'subject', 'preson'].every((key) => typeof record[key] === 'string'),
+        ['id', 'status', 'subject', 'preson'].every((key) => typeof record[key] === 'string') &&
+        isOptionalData(record['optinalData']),
     )
+  );
+}
+
+function isOptionalData(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  return (
+    isObject(value) &&
+    ['firstName', 'lastName', 'surname', 'city', 'postalCode'].every(
+      (key) => typeof value[key] === 'string',
+    ) &&
+    typeof value['age'] === 'number' &&
+    Number.isInteger(value['age']) &&
+    value['age'] >= 0
   );
 }
 

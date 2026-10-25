@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import pl.example.springtest.dto.ProcessingResponseDto;
 import pl.example.springtest.dto.ProcessingResponseDto.OverallStatus;
+import pl.example.springtest.dto.ProcessingResponseDto.OptionalData;
 import pl.example.springtest.dto.ProcessingResponseDto.ProcessingRecord;
 
 @RestController
@@ -42,7 +43,11 @@ public class FileProcessingController {
                 UUID.randomUUID().toString(),
                 OverallStatus.VALID,
                 List.of("Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentów."),
-                List.of(new ProcessingRecord("record-1", "VALID", "Przykładowy dokument", "Przykładowa osoba"))
+                List.of(
+                        new ProcessingRecord("record-1", "VALID", "Przykładowy dokument", "Przykładowa osoba", null),
+                        new ProcessingRecord("record-2", "VALID", "Dokument z dodatkowymi danymi", "Anna Kowalska",
+                                new OptionalData("Anna", "Kowalska", "Nowak", 34, "Warszawa", "00-001"))
+                )
         );
 
         MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();

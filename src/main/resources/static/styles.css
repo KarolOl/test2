@@ -343,6 +343,11 @@ button:disabled {
     overflow-x: auto;
 }
 
+.record-details {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    padding: 12px 0;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;

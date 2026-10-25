@@ -65,6 +65,8 @@ Walidacja działa przy wyborze z dysku, przeciąganiu pliku oraz przed wysłanie
 
 Widok pokazuje identyfikator wyniku, status, ostrzeżenia, liczbę rekordów i tabelę. Przycisk pobierania PDF jest zawsze dostępny po poprawnej odpowiedzi; drugi pojawia się tylko po otrzymaniu `secondFile`. Nazwy w przyciskach i nazwy pobieranych plików pochodzą z `filename` w `Content-Disposition` poszczególnych części odpowiedzi. Pliki nie są konwertowane do Base64. Adresy pobierania są zwalniane przy zmianie lub wyczyszczeniu odpowiedzi oraz zniszczeniu komponentu.
 
+Rekord może opcjonalnie zawierać `optinalData` (pisownia zgodna z API) z polami `firstName`, `lastName`, `surname`, `age`, `city`, `postalCode`. Wiek jest nieujemną liczbą całkowitą; pozostałe pola są tekstowe. Obiekt może być pominięty lub mieć wartość `null`. Gdy jest obecny, pod wierszem rekordu pojawia się stale otwarta sekcja „Dodatkowe dane” z sześcioma polami w responsywnej siatce, bez możliwości zwijania. Brak obiektu nie dodaje pustej sekcji. Drugi rekord demonstracyjny backendu zawiera przykładowe dane.
+
 Backend demonstracyjny zawsze zwraca własny przykładowy PDF. Opcjonalny plik `wynik.json` można włączyć ustawieniem backendu `app.processing.include-second-file=true`; domyślnie ustawienie jest wyłączone. Ustawienie to nie należy do settings frontendu i nie zależy od przesłania drugiego pliku.
 
 ## Kontener nginx

@@ -58,6 +58,41 @@
             <td class="text-break">{{ record.subject || '—' }}</td>
             <td class="text-break">{{ record.preson || '—' }}</td>
           </tr>
+          @if (record.optinalData; as data) {
+            <tr>
+              <td colspan="4" class="bg-body-tertiary">
+                <section [attr.aria-label]="'Dodatkowe dane rekordu ' + record.id">
+                  <h3 class="h6 text-secondary fw-semibold mb-0">Dodatkowe dane</h3>
+                  <dl class="row g-3 p-3 mb-0">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                      <dt class="small text-body-secondary mb-1">Imię</dt>
+                      <dd class="mb-0 text-break">{{ data.firstName || '—' }}</dd>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                      <dt class="small text-body-secondary mb-1">Nazwisko</dt>
+                      <dd class="mb-0 text-break">{{ data.lastName || '—' }}</dd>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                      <dt class="small text-body-secondary mb-1">Nazwisko (surname)</dt>
+                      <dd class="mb-0 text-break">{{ data.surname || '—' }}</dd>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                      <dt class="small text-body-secondary mb-1">Wiek</dt>
+                      <dd class="mb-0">{{ data.age }}</dd>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                      <dt class="small text-body-secondary mb-1">Miasto</dt>
+                      <dd class="mb-0 text-break">{{ data.city || '—' }}</dd>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                      <dt class="small text-body-secondary mb-1">Kod pocztowy</dt>
+                      <dd class="mb-0 text-break">{{ data.postalCode || '—' }}</dd>
+                    </div>
+                  </dl>
+                </section>
+              </td>
+            </tr>
+          }
         } @empty {
           <tr>
             <td colspan="4" class="text-center text-body-secondary py-4">Brak rekordów.</td>

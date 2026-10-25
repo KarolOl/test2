@@ -16,4 +16,14 @@ export interface ProcessingRecord {
   status: string;
   subject: string;
   preson: string;
+  optinalData?: ProcessingOptionalData | null;
+}
+
+export interface ProcessingOptionalData {
+  firstName: string;
+  lastName: string;
+  surname: string;
+  age: number;
+  city: string;
+  postalCode: string;
 }

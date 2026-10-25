@@ -52,6 +52,20 @@ Przykładowa zawartość części `jsonResult`:
       "status": "VALID",
       "subject": "Przykładowy dokument",
       "preson": "Przykładowa osoba"
+    },
+    {
+      "id": "record-2",
+      "status": "VALID",
+      "subject": "Dokument z dodatkowymi danymi",
+      "preson": "Anna Kowalska",
+      "optinalData": {
+        "firstName": "Anna",
+        "lastName": "Kowalska",
+        "surname": "Nowak",
+        "age": 34,
+        "city": "Warszawa",
+        "postalCode": "00-001"
+      }
     }
   ]
 }
@@ -59,7 +73,9 @@ Przykładowa zawartość części `jsonResult`:
 
 `overallStatus` przyjmuje `VALID` lub `INVALID`. Pisownia `preson` jest częścią kontraktu API.
 
-Pliki wyjściowe są niezależne od uploadu, również od obecności opcjonalnego wejściowego `secondFile`. Backend demonstracyjny zawsze zwraca własny przykładowy PDF jako `firstPdfFile` z nazwą `raport.pdf`. Nie wykonuje rzeczywistej weryfikacji dokumentów; wynik i rekord są przykładowe.
+`optinalData` jest opcjonalnym obiektem rekordu (pisownia zgodna z kontraktem). Pierwszy przykładowy rekord nie zawiera tego pola, a drugi zawiera komplet dodatkowych danych. `age` jest nieujemną liczbą całkowitą; pozostałe pola są tekstowe, również `postalCode`, aby zachować zera na początku. Frontend akceptuje pominięte `optinalData` lub `null`; dla obecnego obiektu pokazuje stale otwartą sekcję „Dodatkowe dane” pod odpowiednim wierszem tabeli.
+
+Pliki wyjściowe są niezależne od uploadu, również od obecności opcjonalnego wejściowego `secondFile`. Backend demonstracyjny zawsze zwraca własny przykładowy PDF jako `firstPdfFile` z nazwą `raport.pdf`. Nie wykonuje rzeczywistej weryfikacji dokumentów; wynik i rekordy są przykładowe.
 
 Ustawienie backendu w `src/main/resources/application.properties`:
 

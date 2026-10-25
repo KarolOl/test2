@@ -225,6 +225,30 @@ function renderResult(data) {
             row.append(cell);
         }
         records.append(row);
+        if (record.optinalData && typeof record.optinalData === "object") {
+            const detailRow = document.createElement("tr");
+            const detailCell = document.createElement("td");
+            detailCell.colSpan = 4;
+            const additionalData = document.createElement("section");
+            additionalData.setAttribute("aria-label", `Dodatkowe dane rekordu ${record.id}`);
+            const heading = document.createElement("h3");
+            heading.textContent = "Dodatkowe dane";
+            const fields = document.createElement("dl");
+            fields.className = "record-details";
+            for (const [key, label] of [["firstName", "Imię"], ["lastName", "Nazwisko"], ["surname", "Nazwisko (surname)"], ["age", "Wiek"], ["city", "Miasto"], ["postalCode", "Kod pocztowy"]]) {
+                const field = document.createElement("div");
+                const title = document.createElement("dt");
+                const value = document.createElement("dd");
+                title.textContent = label;
+                value.textContent = record.optinalData[key] ?? "—";
+                field.append(title, value);
+                fields.append(field);
+            }
+            additionalData.append(heading, fields);
+            detailCell.append(additionalData);
+            detailRow.append(detailCell);
+            records.append(detailRow);
+        }
     }
     if (!data.records.length) {
         const row = document.createElement("tr");
