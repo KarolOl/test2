@@ -19,16 +19,6 @@
       <dd class="fw-semibold mb-0">{{ result.records.length }}</dd>
     </div>
   </dl>
-  @if (result.warns.length) {
-    <div class="alert alert-warning" role="status">
-      <h3 class="h6">Ostrzeżenia ({{ result.warns.length }})</h3>
-      <ul class="mb-0 ps-3">
-        @for (warning of result.warns; track $index) {
-          <li class="text-break">{{ warning }}</li>
-        }
-      </ul>
-    </div>
-  }
   <div class="table-responsive">
     <table class="table table-striped table-hover align-middle mb-0">
       <caption class="visually-hidden">
@@ -101,6 +91,16 @@
       </tbody>
     </table>
   </div>
+  @if (result.warns.length) {
+    <div class="alert alert-warning mt-3 mb-0" role="status">
+      <h3 class="h6">Ostrzeżenia ({{ result.warns.length }})</h3>
+      <ul class="mb-0 ps-3">
+        @for (warning of result.warns; track $index) {
+          <li class="text-break">{{ warning }}</li>
+        }
+      </ul>
+    </div>
+  }
   <div class="d-flex justify-content-end gap-2 flex-wrap mt-4" aria-label="Pliki do pobrania">
     @for (download of downloads(); track download.url) {
       <a

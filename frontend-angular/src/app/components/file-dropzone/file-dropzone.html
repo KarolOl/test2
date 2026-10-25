@@ -16,15 +16,16 @@
     (drop)="dropFile($event)"
   >
     <span
-      class="fw-semibold text-body text-break w-100 pe-4"
+      class="d-flex flex-column align-items-center gap-1 w-100 text-center"
       role="status"
       aria-live="polite"
       aria-atomic="true"
     >
       @if (file(); as selectedFile) {
-        {{ selectedFile.name }}
+        <span class="small text-body-secondary">Nazwa pliku</span>
+        <span class="fw-semibold text-body text-break w-100">{{ selectedFile.name }}</span>
       } @else {
-        {{ label() }}
+        <span class="fw-semibold text-body">{{ label() }}</span>
       }
     </span>
     @if (file()) {
@@ -45,7 +46,6 @@
         <path d="M14 2v6h6M8 13h8M8 17h5" />
       </svg>
       <span class="small fw-semibold">{{ label() }}</span>
-      <span class="badge text-bg-secondary align-self-center">Plik dodany</span>
     } @else {
       <span class="small text-body-secondary">Nie wybrano pliku</span>
     }
