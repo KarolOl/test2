@@ -1,0 +1,9 @@
+node_modules
+dist
+.angular
+.git
+.vscode
+coverage
+*.log
+settings*.json
+!public/settings.json

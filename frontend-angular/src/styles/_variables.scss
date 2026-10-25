@@ -1,0 +1,20 @@
+// Wspólna paleta aplikacji i motywu Bootstrap.
+$color-primary: #6c757d; // Bootstrap $gray-600 / secondary.
+$color-secondary: #6c757d;
+$color-text: #17202a;
+$color-text-muted: #566474;
+$color-background: #eef2f6;
+$color-surface: #fff;
+$color-border: #ccd6e0;
+$color-transparent: transparent;
+
+// Kolory pochodne zachowują powiązanie z paletą bazową.
+$color-avatar-shadow: rgba($color-text, 0.18);
+$color-avatar-hover-shadow: rgba($color-text, 0.24);
+$color-primary-shadow: rgba($color-primary, 0.14);
+$color-avatar-highlight: rgba($color-surface, 0.34);
+$color-spinner-overlay: rgba($color-background, 0.9);
+
+// Odcień avatara jest wyliczany z nazwy użytkownika.
+$avatar-saturation: 82%;
+$avatar-lightness: 48%;

@@ -19,14 +19,16 @@ public class FileProcessingController {
     @PostMapping(path = "/process", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ProcessingResponseDto processFiles(
             @RequestPart("firstFile") MultipartFile firstFile,
-            @RequestPart("secondFile") MultipartFile secondFile
+            @RequestPart(value = "secondFile", required = false) MultipartFile secondFile
     ) throws IOException {
         String firstName = safeOriginalFilename(firstFile);
-        String secondName = safeOriginalFilename(secondFile);
         String pdfFileInBase64 = Base64.getEncoder().encodeToString(firstFile.getBytes());
+        String result = secondFile == null
+                ? "Dummy processing completed for file: %s".formatted(firstName)
+                : "Dummy processing completed for files: %s and %s".formatted(firstName, safeOriginalFilename(secondFile));
 
         return new ProcessingResponseDto(
-                "Dummy processing completed for files: %s and %s".formatted(firstName, secondName),
+                result,
                 pdfFileInBase64
         );
     }

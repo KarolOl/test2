@@ -1,3 +1,5 @@
+import Keycloak from "https://cdn.jsdelivr.net/npm/keycloak-js@26.2.4/+esm";
+
 const form = document.querySelector("#uploadForm");
 const submitButton = document.querySelector("#submitButton");
 const submitLabel = document.querySelector("#submitLabel");
@@ -70,11 +72,6 @@ logoutButton.addEventListener("click", () => keycloak.logout());
 
 async function initKeycloak() {
     setFormEnabled(false);
-
-    if (typeof Keycloak === "undefined") {
-        showAuthError("Nie udalo sie zaladowac adaptera Keycloak z localhost:8085.");
-        return;
-    }
 
     keycloak = new Keycloak({
         url: "http://localhost:8085",

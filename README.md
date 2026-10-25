@@ -14,6 +14,9 @@ Po starcie aplikacji frontend jest dostepny pod adresem:
 http://localhost:8080/
 ```
 
+Osobna wersja frontendu w Angularze znajduje sie w katalogu `frontend-angular`.
+Instrukcja uruchomienia jest dostepna w `frontend-angular/README.md`.
+
 ## Endpoint
 
 ```http
@@ -23,8 +26,8 @@ Content-Type: multipart/form-data
 
 Pola formularza:
 
-- `firstFile`
-- `secondFile`
+- `firstFile` — wymagany
+- `secondFile` — opcjonalny
 
 Odpowiedz:
 

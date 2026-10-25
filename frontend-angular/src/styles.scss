@@ -1,0 +1,24 @@
+@use './styles/variables' as colors;
+@use 'bootstrap/scss/bootstrap' with (
+  $primary: colors.$color-primary,
+  $secondary: colors.$color-secondary,
+  $body-bg: colors.$color-background,
+  $body-color: colors.$color-text,
+  $body-secondary-color: colors.$color-text-muted,
+  $border-color: colors.$color-border,
+  $card-bg: colors.$color-surface,
+  $input-bg: colors.$color-surface,
+  $dropdown-bg: colors.$color-surface,
+  $font-family-sans-serif: (
+    Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif,
+  )
+);
+
+:root {
+  color-scheme: light;
+  --app-spinner-overlay: #{colors.$color-spinner-overlay};
+}

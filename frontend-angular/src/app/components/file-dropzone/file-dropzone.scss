@@ -1,0 +1,43 @@
+@use '../../../styles/variables' as colors;
+
+.dropzone {
+  min-height: 190px;
+  border-style: dashed !important;
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.dropzone:focus-within {
+  outline: 2px solid colors.$color-primary;
+  outline-offset: 3px;
+}
+
+.dropzone.has-file {
+  border-style: solid !important;
+}
+
+.extensions-help {
+  width: 15rem;
+  max-width: calc(100vw - 3rem);
+}
+
+.dropzone.is-disabled {
+  opacity: 0.72;
+  cursor: progress;
+}
+
+.dropzone:not(.is-disabled):hover,
+.dropzone.is-dragging {
+  border-color: colors.$color-primary !important;
+  box-shadow: 0 10px 28px colors.$color-primary-shadow;
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropzone {
+    transition: none;
+  }
+}

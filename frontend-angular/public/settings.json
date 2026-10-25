@@ -1,0 +1,13 @@
+{
+  "appTitle": "Przetwarzanie plików",
+  "apiBaseUrl": "/api",
+  "keycloak": {
+    "url": "http://localhost:8085",
+    "realm": "test",
+    "clientId": "test-public"
+  },
+  "fileExtensions": {
+    "firstFile": [".pdf"],
+    "secondFile": [".xml"]
+  }
+}

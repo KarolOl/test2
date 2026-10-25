@@ -1,0 +1,80 @@
+<div class="position-relative h-100">
+  <label
+    class="dropzone d-flex flex-column gap-2 h-100 w-100 border rounded p-4 text-center"
+    [class.justify-content-center]="!file()"
+    [class.has-file]="!!file()"
+    [class.bg-body-tertiary]="!file()"
+    [class.bg-secondary-subtle]="!!file()"
+    [class.border-secondary]="!!file()"
+    [class.border-2]="!!file()"
+    [class.is-dragging]="isDragging()"
+    [class.is-disabled]="disabled()"
+    [for]="inputId()"
+    (dragenter)="dragOver($event)"
+    (dragover)="dragOver($event)"
+    (dragleave)="dragLeave($event)"
+    (drop)="dropFile($event)"
+  >
+    <span
+      class="fw-semibold text-body text-break w-100 pe-4"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      @if (file(); as selectedFile) {
+        {{ selectedFile.name }}
+      } @else {
+        {{ label() }}
+      }
+    </span>
+    @if (file()) {
+      <svg
+        class="align-self-center text-secondary my-1"
+        width="36"
+        height="36"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+        <path d="M14 2v6h6M8 13h8M8 17h5" />
+      </svg>
+      <span class="small fw-semibold">{{ label() }}</span>
+      <span class="badge text-bg-secondary align-self-center">Plik dodany</span>
+    } @else {
+      <span class="small text-body-secondary">Nie wybrano pliku</span>
+    }
+    <span class="small text-body-secondary">{{
+      file() ? 'Kliknij lub przeciągnij, aby zmienić plik' : 'Przeciągnij plik tutaj albo kliknij'
+    }}</span>
+    <input
+      class="visually-hidden"
+      [id]="inputId()"
+      [name]="inputId()"
+      type="file"
+      [attr.accept]="accept() || null"
+      [disabled]="disabled()"
+      (change)="selectFile($event)"
+    />
+  </label>
+  <details class="position-absolute top-0 end-0 m-2">
+    <summary
+      class="btn btn-sm btn-outline-secondary rounded-circle px-2 py-1 lh-1"
+      [attr.aria-label]="'Dozwolone rozszerzenia: ' + label()"
+      title="Dozwolone rozszerzenia"
+    >
+      <span aria-hidden="true">?</span>
+    </summary>
+    <div
+      class="extensions-help position-absolute end-0 z-3 mt-2 p-3 bg-white border rounded shadow small text-start text-break"
+    >
+      <p class="fw-semibold mb-1">Dozwolone rozszerzenia</p>
+      {{ allowedExtensions().length ? allowedExtensions().join(', ') : 'Dowolne rozszerzenie' }}
+    </div>
+  </details>
+</div>

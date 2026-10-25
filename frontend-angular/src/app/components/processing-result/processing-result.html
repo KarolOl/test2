@@ -1,0 +1,26 @@
+<section class="border-top mt-4 pt-4">
+  <h2 class="h5 mb-3">Odpowiedź</h2>
+  <dl class="d-grid gap-3 mb-0">
+    <div>
+      <dt class="small text-body-secondary mb-1">result</dt>
+      <dd class="mb-0 text-break">{{ response().result }}</dd>
+    </div>
+    <div>
+      <dt class="small text-body-secondary mb-1">pdfFileInBase64</dt>
+      <dd class="mb-0">
+        <textarea
+          class="form-control font-monospace small"
+          rows="6"
+          aria-label="PDF w formacie Base64"
+          readonly
+          [value]="response().pdfFileInBase64"
+        ></textarea>
+      </dd>
+    </div>
+  </dl>
+  @if (pdfDownloadUrl(); as downloadUrl) {
+    <div class="d-flex justify-content-end mt-3">
+      <a class="btn btn-secondary px-4" [href]="downloadUrl" download="decoded.pdf">Pobierz PDF</a>
+    </div>
+  }
+</section>

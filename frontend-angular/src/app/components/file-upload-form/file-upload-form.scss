@@ -1,0 +1,8 @@
+.clear-dialog {
+  width: min(28rem, calc(100% - 2rem));
+  margin: auto;
+}
+
+.clear-dialog::backdrop {
+  background: rgba(var(--bs-dark-rgb), 0.5);
+}

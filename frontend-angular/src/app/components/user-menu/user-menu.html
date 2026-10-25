@@ -1,0 +1,31 @@
+<div class="d-flex align-items-center justify-content-end gap-2">
+  <span class="small text-body-secondary text-end text-break lh-sm"
+    >Cześć<br /><strong class="text-body">{{ displayName() }}</strong></span
+  >
+  <div class="dropdown flex-shrink-0">
+    <button
+      class="avatar-button btn border-0 rounded-circle p-0"
+      type="button"
+      aria-haspopup="true"
+      [attr.aria-expanded]="isOpen()"
+      aria-label="Otwórz menu użytkownika"
+      (click)="toggleMenu($event)"
+    >
+      <span
+        class="user-avatar d-grid position-relative overflow-hidden rounded-circle text-white fs-4 fw-bold"
+        [style.--avatar-hue]="avatarHue()"
+        >{{ initial() }}</span
+      >
+    </button>
+    @if (isOpen()) {
+      <div
+        class="dropdown-menu dropdown-menu-end show shadow end-0 mt-2"
+        (click)="$event.stopPropagation()"
+      >
+        <button class="dropdown-item" type="button" (click)="logoutRequested.emit()">
+          Wyloguj
+        </button>
+      </div>
+    }
+  </div>
+</div>
