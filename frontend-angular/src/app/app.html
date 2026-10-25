@@ -37,7 +37,7 @@
           (validationFailed)="errorMessage.set($event)"
         />
         @if (result(); as response) {
-          <app-processing-result [response]="response" [pdfDownloadUrl]="pdfDownloadUrl()" />
+          <app-processing-result [response]="response" />
         }
         <footer class="border-top mt-4 pt-3 small text-body-secondary">
           Licencja <a class="link-secondary" href="LICENSE" rel="license">Apache 2.0</a>

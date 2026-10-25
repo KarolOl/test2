@@ -36,10 +36,10 @@
                 </label>
 
                 <label class="field dropzone" for="secondFile">
-                    <span class="field-title">Drugi plik</span>
+                    <span class="field-title">Drugi plik (opcjonalny)</span>
                     <span class="dropzone-copy">Przeciagnij plik tutaj albo kliknij</span>
                     <span id="secondFileName" class="file-name">Nie wybrano pliku</span>
-                    <input id="secondFile" name="secondFile" type="file" required>
+                    <input id="secondFile" name="secondFile" type="file">
                 </label>
             </div>
 
@@ -53,15 +53,23 @@
             <h2>Odpowiedz</h2>
             <dl>
                 <div>
-                    <dt>result</dt>
-                    <dd id="resultValue"></dd>
+                    <dt>Identyfikator wyniku</dt>
+                    <dd id="resultId"></dd>
                 </div>
                 <div>
-                    <dt>pdfFileInBase64</dt>
-                    <dd><textarea id="base64Value" readonly></textarea></dd>
+                    <dt>Status</dt>
+                    <dd id="overallStatus"></dd>
                 </div>
             </dl>
-            <a id="downloadPdfLink" class="download-link" href="#" download="decoded.pdf" hidden>Pobierz PDF</a>
+            <ul id="warnings" aria-label="Ostrzeżenia"></ul>
+            <div class="table-scroll">
+                <table>
+                    <caption>Rekordy wyniku przetwarzania</caption>
+                    <thead><tr><th scope="col">ID</th><th scope="col">Status</th><th scope="col">Przedmiot</th><th scope="col">Osoba</th></tr></thead>
+                    <tbody id="records"></tbody>
+                </table>
+            </div>
+            <div id="downloadLinks" class="response-actions" aria-label="Pliki do pobrania"></div>
         </section>
 
         <p id="error" class="error" role="alert" hidden></p>

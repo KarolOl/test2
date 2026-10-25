@@ -29,16 +29,45 @@ Pola formularza:
 - `firstFile` — wymagany
 - `secondFile` — opcjonalny
 
-Odpowiedz:
+Odpowiedz ma typ `multipart/form-data; boundary=...` i zawiera części:
+
+| Nazwa części   | Typ                                              | Obecność    |
+| -------------- | ------------------------------------------------ | ----------- |
+| `firstPdfFile` | binarny PDF, `Content-Disposition` z `filename`  | zawsze      |
+| `secondFile`   | plik binarny, `Content-Disposition` z `filename` | opcjonalnie |
+| `jsonResult`   | `application/json`                               | zawsze      |
+
+Przykładowa zawartość części `jsonResult`:
 
 ```json
 {
-  "result": "Dummy processing completed for files: input.pdf and metadata.txt",
-  "pdfFileInBase64": "..."
+  "id": "identyfikator-wyniku",
+  "overallStatus": "VALID",
+  "warns": [
+    "Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentów."
+  ],
+  "records": [
+    {
+      "id": "record-1",
+      "status": "VALID",
+      "subject": "Przykładowy dokument",
+      "preson": "Przykładowa osoba"
+    }
+  ]
 }
 ```
 
-W dummy implementacji `pdfFileInBase64` jest Base64 z pierwszego przeslanego pliku.
+`overallStatus` przyjmuje `VALID` lub `INVALID`. Pisownia `preson` jest częścią kontraktu API.
+
+Pliki wyjściowe są niezależne od uploadu, również od obecności opcjonalnego wejściowego `secondFile`. Backend demonstracyjny zawsze zwraca własny przykładowy PDF jako `firstPdfFile` z nazwą `raport.pdf`. Nie wykonuje rzeczywistej weryfikacji dokumentów; wynik i rekord są przykładowe.
+
+Ustawienie backendu w `src/main/resources/application.properties`:
+
+```properties
+app.processing.include-second-file=false
+```
+
+Po ustawieniu `true` backend dołącza dodatkową część `secondFile` z nazwą `wynik.json`, zawierającą przykładowy wynik JSON. Nie wymaga to przesłania drugiego pliku wejściowego. Przy `false` część `secondFile` jest całkowicie pomijana. Nazwy i typy plików frontend odczytuje z części odpowiedzi, a nie z uploadu.
 
 ## Endpoint TSL
 

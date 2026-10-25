@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { APP_SETTINGS } from './config/app-settings';
 import { FileProcessingResponse } from './models/file-processing-response';
 import { AuthenticationService } from './services/authentication.service';
@@ -24,14 +17,13 @@ import { LoadingSpinner } from './components/loading-spinner/loading-spinner';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.html',
 })
-export class App implements OnInit, OnDestroy {
+export class App implements OnInit {
   protected readonly settings = inject(APP_SETTINGS);
   protected readonly isInitializing = signal(true);
   protected readonly isSubmitting = signal(false);
   protected readonly userName = signal('');
   protected readonly result = signal<FileProcessingResponse | null>(null);
   protected readonly errorMessage = signal('');
-  protected readonly pdfDownloadUrl = signal<string | null>(null);
 
   constructor(
     protected readonly authentication: AuthenticationService,
@@ -52,10 +44,6 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.revokePdfUrl();
-  }
-
   protected async submit({ firstFile, secondFile }: FilePair): Promise<void> {
     if (!this.authentication.isAuthenticated() || this.isSubmitting()) return;
 
@@ -65,7 +53,6 @@ export class App implements OnInit, OnDestroy {
     try {
       const response = await this.fileProcessing.process(firstFile, secondFile);
       this.result.set(response);
-      this.createPdfDownload(response.pdfFileInBase64);
     } catch (error) {
       this.errorMessage.set(`Nie udało się wysłać plików: ${this.getErrorMessage(error)}`);
     } finally {
@@ -76,33 +63,10 @@ export class App implements OnInit, OnDestroy {
   protected clearResponse(): void {
     this.result.set(null);
     this.errorMessage.set('');
-    this.revokePdfUrl();
   }
 
   protected logout(): void {
     void this.authentication.logout();
-  }
-
-  private createPdfDownload(base64Value: string | null | undefined): void {
-    if (!base64Value) {
-      return;
-    }
-
-    try {
-      const binary = atob(base64Value);
-      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-      this.pdfDownloadUrl.set(URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })));
-    } catch {
-      this.errorMessage.set('Odpowiedź zawiera nieprawidłowe dane PDF w formacie Base64.');
-    }
-  }
-
-  private revokePdfUrl(): void {
-    const url = this.pdfDownloadUrl();
-    if (url) {
-      URL.revokeObjectURL(url);
-      this.pdfDownloadUrl.set(null);
-    }
   }
 
   private getErrorMessage(error: unknown): string {

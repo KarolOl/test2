@@ -327,6 +327,44 @@ button:disabled {
     padding-top: 24px;
 }
 
+.response-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.response-actions a {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #d8e0e8;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.status-valid {
+    color: #146c43;
+    font-weight: 700;
+}
+
+.status-invalid {
+    color: #b02a37;
+    font-weight: 700;
+}
+
 dl {
     display: grid;
     gap: 18px;
@@ -342,16 +380,6 @@ dt {
 
 dd {
     margin: 0;
-}
-
-textarea {
-    width: 100%;
-    min-height: 160px;
-    resize: vertical;
-    border: 1px solid #ccd6e0;
-    border-radius: 8px;
-    padding: 12px;
-    font: 0.9rem/1.5 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
 }
 
 .error {

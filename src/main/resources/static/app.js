@@ -5,9 +5,11 @@ const submitButton = document.querySelector("#submitButton");
 const submitLabel = document.querySelector("#submitLabel");
 const submitLoader = document.querySelector("#submitLoader");
 const responseSection = document.querySelector("#response");
-const resultValue = document.querySelector("#resultValue");
-const base64Value = document.querySelector("#base64Value");
-const downloadPdfLink = document.querySelector("#downloadPdfLink");
+const resultId = document.querySelector("#resultId");
+const overallStatus = document.querySelector("#overallStatus");
+const warnings = document.querySelector("#warnings");
+const records = document.querySelector("#records");
+const downloadLinks = document.querySelector("#downloadLinks");
 const errorBox = document.querySelector("#error");
 const userBar = document.querySelector("#userBar");
 const userGreeting = document.querySelector("#userGreeting");
@@ -16,7 +18,7 @@ const userAvatar = document.querySelector("#userAvatar");
 const userDropdown = document.querySelector("#userDropdown");
 const logoutButton = document.querySelector("#logoutButton");
 
-let pdfObjectUrl;
+let downloadUrls = [];
 let keycloak;
 
 setupDropzone("firstFile", "firstFileName");
@@ -27,13 +29,15 @@ form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const formData = new FormData(form);
+    const secondFile = formData.get("secondFile");
+    if (secondFile instanceof File && !secondFile.name) formData.delete("secondFile");
     submitButton.disabled = true;
     submitLabel.textContent = "Wysylanie...";
     submitLoader.hidden = false;
     errorBox.hidden = true;
     responseSection.hidden = true;
-    downloadPdfLink.hidden = true;
-    revokePdfObjectUrl();
+    revokeDownloadUrls();
+    downloadLinks.replaceChildren();
 
     try {
         await refreshToken();
@@ -41,6 +45,7 @@ form.addEventListener("submit", async (event) => {
         const response = await fetch("/api/files/process", {
             method: "POST",
             headers: {
+                Accept: "multipart/form-data",
                 Authorization: `Bearer ${keycloak.token}`
             },
             body: formData
@@ -50,10 +55,20 @@ form.addEventListener("submit", async (event) => {
             throw new Error(`HTTP ${response.status}`);
         }
 
-        const data = await response.json();
-        resultValue.textContent = data.result ?? "";
-        base64Value.value = data.pdfFileInBase64 ?? "";
-        preparePdfDownload(data.pdfFileInBase64);
+        const parts = await response.formData();
+        const jsonPart = parts.get("jsonResult");
+        if (jsonPart === null) throw new Error("Brak części jsonResult w odpowiedzi.");
+        const data = JSON.parse(typeof jsonPart === "string" ? jsonPart : await jsonPart.text());
+        if (!data || typeof data.id !== "string" || !["VALID", "INVALID"].includes(data.overallStatus) || !Array.isArray(data.warns) || !Array.isArray(data.records)) {
+            throw new Error("Nieprawidłowa struktura części jsonResult.");
+        }
+        const firstPdfFile = parts.get("firstPdfFile");
+        const outputSecondFile = parts.get("secondFile");
+        if (!(firstPdfFile instanceof File) || !firstPdfFile.name || (outputSecondFile !== null && !(outputSecondFile instanceof File))) {
+            throw new Error("Nieprawidłowe części plikowe odpowiedzi.");
+        }
+        renderResult(data);
+        prepareDownloads(outputSecondFile ? [firstPdfFile, outputSecondFile] : [firstPdfFile]);
         responseSection.hidden = false;
     } catch (error) {
         errorBox.textContent = `Nie udalo sie wyslac plikow: ${error.message}`;
@@ -65,7 +80,7 @@ form.addEventListener("submit", async (event) => {
     }
 });
 
-window.addEventListener("beforeunload", revokePdfObjectUrl);
+window.addEventListener("beforeunload", revokeDownloadUrls);
 document.addEventListener("click", closeUserDropdownOnOutsideClick);
 userMenuButton.addEventListener("click", toggleUserDropdown);
 logoutButton.addEventListener("click", () => keycloak.logout());
@@ -191,33 +206,50 @@ function updateFileName(input, fileName) {
     fileName.textContent = input.files.length > 0 ? input.files[0].name : "Nie wybrano pliku";
 }
 
-function preparePdfDownload(base64Value) {
-    if (!base64Value) {
-        return;
+function renderResult(data) {
+    resultId.textContent = data.id;
+    overallStatus.textContent = data.overallStatus;
+    overallStatus.className = data.overallStatus === "VALID" ? "status-valid" : "status-invalid";
+    warnings.replaceChildren();
+    for (const warning of data.warns) {
+        const item = document.createElement("li");
+        item.textContent = warning;
+        warnings.append(item);
     }
-
-    const pdfBytes = base64ToUint8Array(base64Value);
-    const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
-    pdfObjectUrl = URL.createObjectURL(pdfBlob);
-
-    downloadPdfLink.href = pdfObjectUrl;
-    downloadPdfLink.hidden = false;
+    records.replaceChildren();
+    for (const record of data.records) {
+        const row = document.createElement("tr");
+        for (const key of ["id", "status", "subject", "preson"]) {
+            const cell = document.createElement("td");
+            cell.textContent = record[key] || "—";
+            row.append(cell);
+        }
+        records.append(row);
+    }
+    if (!data.records.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.textContent = "Brak rekordów.";
+        row.append(cell);
+        records.append(row);
+    }
 }
 
-function base64ToUint8Array(base64Value) {
-    const binary = atob(base64Value);
-    const bytes = new Uint8Array(binary.length);
-
-    for (let index = 0; index < binary.length; index += 1) {
-        bytes[index] = binary.charCodeAt(index);
+function prepareDownloads(files) {
+    for (const file of files) {
+        const url = URL.createObjectURL(file);
+        downloadUrls.push(url);
+        const link = document.createElement("a");
+        link.className = "download-link";
+        link.href = url;
+        link.download = file.name;
+        link.textContent = `Pobierz ${file.name}`;
+        downloadLinks.append(link);
     }
-
-    return bytes;
 }
 
-function revokePdfObjectUrl() {
-    if (pdfObjectUrl) {
-        URL.revokeObjectURL(pdfObjectUrl);
-        pdfObjectUrl = undefined;
-    }
+function revokeDownloadUrls() {
+    downloadUrls.forEach((url) => URL.revokeObjectURL(url));
+    downloadUrls = [];
 }

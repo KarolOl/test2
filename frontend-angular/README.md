@@ -1,6 +1,6 @@
 # Frontend Angular
 
-Osobny frontend Angular dla aplikacji Spring Boot z katalogu nadrzędnego. Zawiera logowanie przez Keycloak, wybór pierwszego pliku i opcjonalnego drugiego pliku (również metodą drag-and-drop), wysyłkę multipart oraz pobieranie pliku PDF zwróconego jako Base64.
+Osobny frontend Angular dla aplikacji Spring Boot z katalogu nadrzędnego. Zawiera logowanie przez Keycloak, wybór pierwszego pliku i opcjonalnego drugiego pliku (również metodą drag-and-drop), wysyłkę i odbiór multipart oraz graficzny widok wyniku z pobieraniem plików binarnych.
 
 ## Wymagania
 
@@ -57,6 +57,16 @@ Pierwszy plik jest wymagany, a drugi jest opcjonalny. Walidacja rozszerzenia dru
 
 Walidacja działa przy wyborze z dysku, przeciąganiu pliku oraz przed wysłaniem formularza. Niedozwolony plik jest odrzucany, a komunikat pojawia się nad formularzem. Atrybut `accept` filtruje również systemowe okno wyboru plików. To walidacja nazwy pliku po stronie interfejsu; nie sprawdza jego zawartości. Settings są publicznie dostępne w przeglądarce i nie służą do przechowywania sekretów.
 
+## Odpowiedź multipart
+
+`POST /api/files/process` zwraca `multipart/form-data` z obowiązkowymi częściami `firstPdfFile` (PDF) i `jsonResult` (JSON) oraz opcjonalną częścią plikową `secondFile`. Obecność i zawartość plików odpowiedzi są niezależne od plików wejściowych.
+
+`FileProcessingService` pobiera odpowiedź jako `Blob` przez Angular `HttpClient`, zachowując interceptor Bearer, i odczytuje części przez przeglądarkowe `Response.formData()`. JSON jest sprawdzany pod kątem kontraktu `id`, `overallStatus: VALID | INVALID`, `warns` i `records` z polami `id`, `status`, `subject`, `preson`. Nazwa `preson` pozostaje zgodna z API, a w tabeli jest prezentowana jako „Osoba”.
+
+Widok pokazuje identyfikator wyniku, status, ostrzeżenia, liczbę rekordów i tabelę. Przycisk pobierania PDF jest zawsze dostępny po poprawnej odpowiedzi; drugi pojawia się tylko po otrzymaniu `secondFile`. Nazwy w przyciskach i nazwy pobieranych plików pochodzą z `filename` w `Content-Disposition` poszczególnych części odpowiedzi. Pliki nie są konwertowane do Base64. Adresy pobierania są zwalniane przy zmianie lub wyczyszczeniu odpowiedzi oraz zniszczeniu komponentu.
+
+Backend demonstracyjny zawsze zwraca własny przykładowy PDF. Opcjonalny plik `wynik.json` można włączyć ustawieniem backendu `app.processing.include-second-file=true`; domyślnie ustawienie jest wyłączone. Ustawienie to nie należy do settings frontendu i nie zależy od przesłania drugiego pliku.
+
 ## Kontener nginx
 
 `Dockerfile` buduje frontend w etapie Node.js i serwuje go przez nginx. Poniższe polecenia wykonuj w katalogu `frontend-angular`:
@@ -93,11 +103,11 @@ nginx generuje publiczny `settings.json` przy każdym starcie kontenera i wyłą
 
 ## Struktura komponentów
 
-- `App` — wczytanie profilu zalogowanego użytkownika, wysyłka do API i cykl życia adresu pobierania PDF.
+- `App` — wczytanie profilu zalogowanego użytkownika, wysyłka do API i czyszczenie odpowiedzi.
 - `UserMenu` — avatar i menu użytkownika.
 - `FileUploadForm` — wybór wymaganego pierwszego pliku i opcjonalnego drugiego oraz walidacja formularza.
 - `FileDropzone` — wielokrotnie używane pole wyboru pliku z drag-and-drop.
-- `ProcessingResult` — odpowiedź API i link do PDF.
+- `ProcessingResult` — status i ostrzeżenia, tabela rekordów, pobieranie jednego lub dwóch plików i cykl życia adresów pobierania.
 - `LoadingSpinner` — `ngx-spinner` z animacją `square-spin` (rotating cube), widoczny podczas logowania i przetwarzania plików.
 
 ## Style i kolory

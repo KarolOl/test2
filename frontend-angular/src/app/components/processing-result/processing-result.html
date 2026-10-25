@@ -1,26 +1,80 @@
-<section class="border-top mt-4 pt-4">
-  <h2 class="h5 mb-3">Odpowiedź</h2>
-  <dl class="d-grid gap-3 mb-0">
-    <div>
-      <dt class="small text-body-secondary mb-1">result</dt>
-      <dd class="mb-0 text-break">{{ response().result }}</dd>
+@let result = response().jsonResult;
+<section class="border-top mt-4 pt-4" aria-labelledby="processing-result-title">
+  <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+    <h2 id="processing-result-title" class="h5 mb-0">Wynik przetwarzania</h2>
+    <span
+      class="badge fs-6"
+      [class.text-bg-success]="result.overallStatus === 'VALID'"
+      [class.text-bg-danger]="result.overallStatus === 'INVALID'"
+      >{{ result.overallStatus }}</span
+    >
+  </div>
+  <dl class="row g-3 mb-4">
+    <div class="col-12 col-sm-8">
+      <dt class="small text-body-secondary mb-1">Identyfikator wyniku</dt>
+      <dd class="font-monospace small text-break mb-0">{{ result.id }}</dd>
     </div>
-    <div>
-      <dt class="small text-body-secondary mb-1">pdfFileInBase64</dt>
-      <dd class="mb-0">
-        <textarea
-          class="form-control font-monospace small"
-          rows="6"
-          aria-label="PDF w formacie Base64"
-          readonly
-          [value]="response().pdfFileInBase64"
-        ></textarea>
-      </dd>
+    <div class="col-12 col-sm-4">
+      <dt class="small text-body-secondary mb-1">Liczba rekordów</dt>
+      <dd class="fw-semibold mb-0">{{ result.records.length }}</dd>
     </div>
   </dl>
-  @if (pdfDownloadUrl(); as downloadUrl) {
-    <div class="d-flex justify-content-end mt-3">
-      <a class="btn btn-secondary px-4" [href]="downloadUrl" download="decoded.pdf">Pobierz PDF</a>
+  @if (result.warns.length) {
+    <div class="alert alert-warning" role="status">
+      <h3 class="h6">Ostrzeżenia ({{ result.warns.length }})</h3>
+      <ul class="mb-0 ps-3">
+        @for (warning of result.warns; track $index) {
+          <li class="text-break">{{ warning }}</li>
+        }
+      </ul>
     </div>
   }
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle mb-0">
+      <caption class="visually-hidden">
+        Rekordy wyniku przetwarzania
+      </caption>
+      <thead class="table-light">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Status</th>
+          <th scope="col">Przedmiot</th>
+          <th scope="col">Osoba</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (record of result.records; track $index) {
+          <tr>
+            <th scope="row" class="small font-monospace fw-normal text-break">{{ record.id }}</th>
+            <td>
+              <span
+                class="badge"
+                [class.text-bg-success]="record.status === 'VALID'"
+                [class.text-bg-danger]="record.status === 'INVALID'"
+                [class.text-bg-secondary]="record.status !== 'VALID' && record.status !== 'INVALID'"
+                >{{ record.status }}</span
+              >
+            </td>
+            <td class="text-break">{{ record.subject || '—' }}</td>
+            <td class="text-break">{{ record.preson || '—' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="text-center text-body-secondary py-4">Brak rekordów.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-end gap-2 flex-wrap mt-4" aria-label="Pliki do pobrania">
+    @for (download of downloads(); track download.url) {
+      <a
+        class="btn btn-secondary text-break mw-100"
+        [href]="download.url"
+        [download]="download.name"
+        [attr.aria-label]="'Pobierz plik ' + download.name"
+        >Pobierz {{ download.name }}</a
+      >
+    }
+  </div>
 </section>
