@@ -120,7 +120,7 @@ Ta konfiguracja CSP działa w kontenerze nginx. Samo `npm start` (`ng serve`) ni
 - `App` — wczytanie profilu zalogowanego użytkownika, wysyłka do API i czyszczenie odpowiedzi.
 - `UserMenu` — avatar i menu użytkownika.
 - `FileUploadForm` — wybór wymaganego pierwszego pliku i opcjonalnego drugiego oraz walidacja formularza.
-- `FileDropzone` — wielokrotnie używane pole wyboru pliku z drag-and-drop.
+- `FileDropzone` — karta wyboru pliku z przyciskiem „Wybierz plik” / „Zmień plik”, wyśrodkowaną nazwą i rozmiarem pliku, oznaczeniem wymagalności, drag-and-drop oraz pomocą dotyczącą rozszerzeń pod „?”. Dwie karty są wyświetlane obok siebie na większych ekranach, a na telefonach jedna pod drugą. Czyszczenie pozostaje wspólne dla obu kart.
 - `ProcessingResult` — status i ostrzeżenia, tabela rekordów, pobieranie jednego lub dwóch plików i cykl życia adresów pobierania.
 - `LoadingSpinner` — `ngx-spinner` z animacją `square-spin` (rotating cube), widoczny podczas logowania i przetwarzania plików.
 

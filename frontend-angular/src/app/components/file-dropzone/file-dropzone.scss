@@ -1,22 +1,30 @@
 @use '../../../styles/variables' as colors;
 
 .dropzone {
-  min-height: 190px;
+  min-height: 200px;
+  background-color: colors.$color-dropzone-background;
+  border-color: rgba(colors.$color-dropzone-accent, 0.4) !important;
   border-style: dashed !important;
-  cursor: pointer;
   transition:
+    background-color 180ms ease,
     border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
+    box-shadow 180ms ease;
 }
 
 .dropzone:focus-within {
-  outline: 2px solid colors.$color-primary;
+  outline: 2px solid colors.$color-dropzone-accent;
   outline-offset: 3px;
 }
 
 .dropzone.has-file {
+  background-color: colors.$color-dropzone-selected-background;
+  border-color: colors.$color-dropzone-accent !important;
   border-style: solid !important;
+  box-shadow: 0 3px 12px rgba(colors.$color-dropzone-accent, 0.08);
+}
+
+.file-icon {
+  color: colors.$color-dropzone-accent;
 }
 
 .extensions-help {
@@ -29,11 +37,14 @@
   cursor: progress;
 }
 
-.dropzone:not(.is-disabled):hover,
+.dropzone:not(.is-disabled):hover {
+  border-color: colors.$color-dropzone-accent !important;
+}
+
 .dropzone.is-dragging {
-  border-color: colors.$color-primary !important;
-  box-shadow: 0 10px 28px colors.$color-primary-shadow;
-  transform: translateY(-2px);
+  border-color: colors.$color-dropzone-accent !important;
+  background-color: colors.$color-dropzone-selected-background;
+  box-shadow: 0 0 0 3px rgba(colors.$color-dropzone-accent, 0.16);
 }
 
 @media (prefers-reduced-motion: reduce) {

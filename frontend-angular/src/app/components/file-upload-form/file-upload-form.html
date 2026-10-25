@@ -4,6 +4,7 @@
       class="col-12 col-md-6"
       inputId="firstFile"
       label="Pierwszy plik"
+      [required]="true"
       [file]="firstFile()"
       [disabled]="submitting()"
       [allowedExtensions]="settings.fileExtensions.firstFile"
@@ -12,7 +13,7 @@
     <app-file-dropzone
       class="col-12 col-md-6"
       inputId="secondFile"
-      label="Drugi plik (opcjonalny)"
+      label="Drugi plik"
       [file]="secondFile()"
       [disabled]="submitting()"
       [allowedExtensions]="settings.fileExtensions.secondFile"
@@ -21,18 +22,14 @@
   </div>
   <div class="d-flex justify-content-end gap-2 flex-wrap">
     <button
-      class="btn btn-primary px-4"
+      class="btn btn-light text-secondary text-decoration-none px-3"
       type="button"
       [disabled]="submitting() || (!firstFile() && !secondFile())"
       (click)="requestClearFiles(clearDialog)"
     >
-      Wyczyść pliki
+      Wyczyść
     </button>
-    <button
-      class="btn btn-danger px-4"
-      type="submit"
-      [disabled]="!authenticated() || submitting()"
-    >
+    <button class="btn btn-danger px-4" type="submit" [disabled]="!authenticated() || submitting()">
       {{ submitting() ? 'Wysyłanie...' : authenticated() ? 'Wyślij' : 'Logowanie...' }}
     </button>
   </div>

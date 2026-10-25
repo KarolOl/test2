@@ -23,7 +23,9 @@
           <app-user-menu class="ms-auto" [displayName]="userName()" (logoutRequested)="logout()" />
         </header>
         <div class="mb-4">
-          <h1 class="h3 fw-semibold text-body mb-0 text-break">{{ settings.appTitle }}</h1>
+          <h1 class="h3 fw-semibold text-body text-center mb-0 text-break">
+            {{ settings.appTitle }}
+          </h1>
         </div>
         @if (errorMessage()) {
           <p class="alert alert-danger mb-4" role="alert">{{ errorMessage() }}</p>
