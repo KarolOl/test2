@@ -103,6 +103,18 @@ Remove-Item Env:SETTINGS_JSON
 
 nginx generuje publiczny `settings.json` przy każdym starcie kontenera i wyłącza jego buforowanie. Zmiana ustawień wymaga ponownego uruchomienia kontenera i odświeżenia strony, bez ponownego budowania obrazu.
 
+## Content Security Policy i nonce
+
+Frontend serwowany przez nginx otrzymuje nagłówek `Content-Security-Policy` przy pobieraniu HTML, także dla ścieżek obsługiwanych przez Angulara. Polityka ogranicza skrypty i arkusze stylów do własnej domeny oraz elementów z prawidłowym nonce, blokuje skrypty i style w atrybutach HTML, obiekty osadzane oraz osadzanie aplikacji w ramkach innych stron. Nie używa `unsafe-inline` ani `unsafe-eval`.
+
+W `src/index.html` element główny ma `ngCspNonce="__CSP_NONCE__"`. Przy każdym pobraniu HTML nginx zastępuje placeholder wartością `$request_id` (16 losowych bajtów zapisanych szesnastkowo). Ten sam nonce trafia do `script-src` i `style-src` nagłówka CSP. Angular odczytuje `ngCspNonce` automatycznie przez `CSP_NONCE` i przypisuje go dynamicznie tworzonym arkuszom stylów, także stylom komponentów bibliotecznych. Nonce nie pochodzi ze settings i nie jest stały dla całego kontenera.
+
+Skrypt `docker/50-csp.sh`, wykonywany po wczytaniu settings, wyprowadza dozwolone originy z `apiBaseUrl` i `keycloak.url`. `connect-src` dopuszcza połączenia do własnej domeny, API i Keycloak, a `frame-src` i `form-action` uwzględniają Keycloak. Dla API pod względną ścieżką `/api` wystarcza własna domena. Skrypt dopuszcza tylko poprawnie wyodrębnione originy HTTP(S), bez wstawiania dowolnego tekstu konfiguracji do nginx. Zmiany adresów w konfiguracji z mounta lub `SETTINGS_JSON` są uwzględniane przy ponownym starcie kontenera.
+
+HTML ma `Cache-Control: no-store`, wyłączone ETag i odpowiedzi warunkowe, aby nagłówek CSP i nonce w dokumencie nie pochodziły z różnych odpowiedzi. Produkcyjny build nie wstawia krytycznego CSS ani fontów bezpośrednio do HTML; skrypty i style globalne są ładowane jako pliki z własnej domeny.
+
+Ta konfiguracja CSP działa w kontenerze nginx. Samo `npm start` (`ng serve`) nie wysyła tej produkcyjnej polityki. Przy serwowaniu z innego serwera trzeba zapewnić równoważną podmianę placeholdera i nagłówek CSP dla każdej odpowiedzi HTML; nie należy używać stałego nonce ani serwować placeholdera jako rzeczywistego nonce.
+
 ## Struktura komponentów
 
 - `App` — wczytanie profilu zalogowanego użytkownika, wysyłka do API i czyszczenie odpowiedzi.
