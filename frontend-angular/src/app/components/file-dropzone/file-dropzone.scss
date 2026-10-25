@@ -18,13 +18,16 @@
 
 .dropzone.has-file {
   background-color: colors.$color-dropzone-selected-background;
-  border-color: colors.$color-dropzone-accent !important;
+  border-color: colors.$color-dropzone-selected-accent !important;
   border-style: solid !important;
-  box-shadow: 0 3px 12px rgba(colors.$color-dropzone-accent, 0.08);
+  border-width: 2px !important;
+  box-shadow:
+    0 0 0 2px rgba(colors.$color-dropzone-selected-accent, 0.1),
+    0 4px 14px rgba(colors.$color-dropzone-selected-accent, 0.12);
 }
 
 .file-icon {
-  color: colors.$color-dropzone-accent;
+  color: colors.$color-dropzone-selected-accent;
 }
 
 .extensions-help {
@@ -37,14 +40,14 @@
   cursor: progress;
 }
 
-.dropzone:not(.is-disabled):hover {
+.dropzone:not(.has-file):not(.is-disabled):hover {
   border-color: colors.$color-dropzone-accent !important;
 }
 
 .dropzone.is-dragging {
-  border-color: colors.$color-dropzone-accent !important;
+  border-color: colors.$color-dropzone-selected-accent !important;
   background-color: colors.$color-dropzone-selected-background;
-  box-shadow: 0 0 0 3px rgba(colors.$color-dropzone-accent, 0.16);
+  box-shadow: 0 0 0 3px rgba(colors.$color-dropzone-selected-accent, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {
