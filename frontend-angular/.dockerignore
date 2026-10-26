@@ -1,5 +1,4 @@
 node_modules
-dist
 .angular
 .git
 .vscode
@@ -7,3 +6,4 @@ coverage
 *.log
 settings*.json
 !public/settings.json
+!dist/frontend-angular/browser/settings.json

@@ -1,5 +1,6 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import {
   AutoRefreshTokenService,
   createInterceptorCondition,
@@ -12,6 +13,7 @@ import {
 } from 'keycloak-angular';
 
 import { APP_SETTINGS, AppSettings } from './config/app-settings';
+import { routes } from './app.routes';
 import { loadingInterceptor } from './interceptors/loading.interceptor';
 
 export function createAppConfig(settings: AppSettings): ApplicationConfig {
@@ -23,6 +25,7 @@ export function createAppConfig(settings: AppSettings): ApplicationConfig {
   return {
     providers: [
       provideBrowserGlobalErrorListeners(),
+      provideRouter(routes),
       { provide: APP_SETTINGS, useValue: settings },
       provideKeycloak({
         config: settings.keycloak,

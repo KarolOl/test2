@@ -17,8 +17,8 @@ else
     cat /opt/app/settings.default.json > "$temporary"
 fi
 
-if ! jq -se 'length == 1 and (.[0] | type == "object")' "$temporary" > /dev/null; then
-    echo 'Settings must contain one valid JSON object.' >&2
+if ! awk -f /opt/app/settings.awk "$temporary" > /dev/null; then
+    echo 'Settings must contain one valid JSON object with safe API and Keycloak URLs.' >&2
     exit 1
 fi
 

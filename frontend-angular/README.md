@@ -71,14 +71,16 @@ Backend demonstracyjny zawsze zwraca własny przykładowy PDF. Opcjonalny plik `
 
 ## Kontener nginx
 
-`Dockerfile` buduje frontend w etapie Node.js i serwuje go przez nginx. Poniższe polecenia wykonuj w katalogu `frontend-angular`:
+`Dockerfile` kopiuje gotowy lokalny build z `dist/frontend-angular/browser` i serwuje go przez nginx. Obraz nie zawiera etapu buildera ani nie instaluje dodatkowych pakietów. Poniższe polecenia wykonuj w katalogu `frontend-angular`:
 
 ```powershell
+npm ci
+npm run build
 docker build -t spring-test-frontend .
 docker run --rm -p 4200:80 -e API_UPSTREAM=http://host.docker.internal:8080 spring-test-frontend
 ```
 
-Domyślna konfiguracja pochodzi z `public/settings.json`. nginx udostępnia aplikację pod `http://localhost:4200`, obsługuje ścieżki Angulara oraz przekazuje `/api/` do backendu. `API_UPSTREAM` to adres backendu widoczny z kontenera, bez końcowego ukośnika i bez ścieżki `/api`, np. `http://backend:8080` w sieci Docker. Na Docker Desktop domyślny `http://host.docker.internal:8080` wskazuje backend uruchomiony na hoście. Na Linuxie można dodać `--add-host host.docker.internal:host-gateway`. Limit całego żądania w nginx wynosi 40 MB, zgodnie z obecną konfiguracją backendu.
+Domyślna konfiguracja pochodzi z `settings.json` w lokalnym buildzie (kopii `public/settings.json` z chwili budowania frontendu). nginx udostępnia aplikację pod `http://localhost:4200`, obsługuje ścieżki Angulara oraz przekazuje `/api/` do backendu. `API_UPSTREAM` to adres backendu widoczny z kontenera, bez końcowego ukośnika i bez ścieżki `/api`, np. `http://backend:8080` w sieci Docker. Na Docker Desktop domyślny `http://host.docker.internal:8080` wskazuje backend uruchomiony na hoście. Na Linuxie można dodać `--add-host host.docker.internal:host-gateway`. Limit całego żądania w nginx wynosi 40 MB, zgodnie z obecną konfiguracją backendu.
 
 ### Settings jako zamontowany JSON
 
@@ -99,7 +101,7 @@ docker run --rm -p 4200:80 -e SETTINGS_JSON -e API_UPSTREAM=http://host.docker.i
 Remove-Item Env:SETTINGS_JSON
 ```
 
-`SETTINGS_JSON` zawiera pełny obiekt JSON, a nie ścieżkę do pliku. Kolejność wyboru konfiguracji: `SETTINGS_JSON`, następnie plik wskazany przez `SETTINGS_FILE` lub domyślny `/etc/app/settings.json`, następnie konfiguracja z obrazu. Konfiguracje zastępują się w całości, nie są scalane. Niepoprawny JSON zatrzymuje start kontenera; strukturę i wartości ustawień weryfikuje też frontend.
+`SETTINGS_JSON` zawiera pełny obiekt JSON, a nie ścieżkę do pliku. Kolejność wyboru konfiguracji: `SETTINGS_JSON`, następnie plik wskazany przez `SETTINGS_FILE` lub domyślny `/etc/app/settings.json`, następnie konfiguracja z obrazu. Konfiguracje zastępują się w całości, nie są scalane. Parser `docker/settings.awk` korzysta z dostępnego w obrazie BusyBox awk, bez `jq`. Niepoprawny JSON lub adresy CSP zatrzymują start kontenera; strukturę i wartości ustawień weryfikuje też frontend.
 
 nginx generuje publiczny `settings.json` przy każdym starcie kontenera i wyłącza jego buforowanie. Zmiana ustawień wymaga ponownego uruchomienia kontenera i odświeżenia strony, bez ponownego budowania obrazu.
 
@@ -117,7 +119,8 @@ Ta konfiguracja CSP działa w kontenerze nginx. Samo `npm start` (`ng serve`) ni
 
 ## Struktura komponentów
 
-- `App` — wczytanie profilu zalogowanego użytkownika, wysyłka do API i czyszczenie odpowiedzi.
+- `App` — powłoka aplikacji zawierająca `router-outlet`.
+- `FileProcessingPage` — widok pod trasą `/`, ładowany przez router; wczytanie profilu zalogowanego użytkownika, wysyłka do API i czyszczenie odpowiedzi.
 - `UserMenu` — avatar i menu użytkownika.
 - `FileUploadForm` — wybór wymaganego pierwszego pliku i opcjonalnego drugiego oraz walidacja formularza.
 - `FileDropzone` — karta wyboru pliku z przyciskiem „Wybierz plik” / „Zmień plik”, wyśrodkowaną nazwą i rozmiarem pliku, oznaczeniem wymagalności, drag-and-drop oraz pomocą dotyczącą rozszerzeń pod „?”. Dwie karty są wyświetlane obok siebie na większych ekranach, a na telefonach jedna pod drugą. Czyszczenie pozostaje wspólne dla obu kart.
