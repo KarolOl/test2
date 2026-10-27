@@ -7,7 +7,6 @@ export interface FileProcessingResponse {
 export interface ProcessingJsonResult {
   id: string;
   overallStatus: 'VALID' | 'INVALID';
-  warns: string[];
   records: ProcessingRecord[];
 }
 
@@ -16,6 +15,7 @@ export interface ProcessingRecord {
   status: string;
   subject: string;
   preson: string;
+  warns: string[];
   optinalData?: ProcessingOptionalData | null;
 }
 

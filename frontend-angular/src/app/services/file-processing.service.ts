@@ -71,13 +71,13 @@ function isProcessingJsonResult(value: unknown): value is ProcessingJsonResult {
   return (
     typeof value['id'] === 'string' &&
     (value['overallStatus'] === 'VALID' || value['overallStatus'] === 'INVALID') &&
-    Array.isArray(value['warns']) &&
-    value['warns'].every((warning: unknown) => typeof warning === 'string') &&
     Array.isArray(value['records']) &&
     value['records'].every(
       (record: unknown) =>
         isObject(record) &&
         ['id', 'status', 'subject', 'preson'].every((key) => typeof record[key] === 'string') &&
+        Array.isArray(record['warns']) &&
+        record['warns'].every((warning: unknown) => typeof warning === 'string') &&
         isOptionalData(record['optinalData']),
     )
   );

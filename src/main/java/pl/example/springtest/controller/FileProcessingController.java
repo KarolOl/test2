@@ -42,10 +42,12 @@ public class FileProcessingController {
         ProcessingResponseDto result = new ProcessingResponseDto(
                 UUID.randomUUID().toString(),
                 OverallStatus.VALID,
-                List.of("Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentów."),
                 List.of(
-                        new ProcessingRecord("record-1", "VALID", "Przykładowy dokument", "Przykładowa osoba", null),
+                        new ProcessingRecord("record-1", "VALID", "Przykładowy dokument", "Przykładowa osoba",
+                                List.of("Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentu."), null),
                         new ProcessingRecord("record-2", "VALID", "Dokument z dodatkowymi danymi", "Anna Kowalska",
+                                List.of("Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentu.",
+                                        "Dodatkowe dane osoby są przykładowe i wymagają potwierdzenia."),
                                 new OptionalData("Anna", "Kowalska", "Nowak", 34, "Warszawa", "00-001"))
                 )
         );

@@ -1,5 +1,5 @@
 @let result = response().jsonResult;
-<section class="border-top mt-4 pt-4" aria-labelledby="processing-result-title">
+<section class="border-top mt-3 pt-3" aria-labelledby="processing-result-title">
   <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
     <h2 id="processing-result-title" class="h5 mb-0">Wynik przetwarzania</h2>
     <span
@@ -9,7 +9,7 @@
       >{{ result.overallStatus }}</span
     >
   </div>
-  <dl class="row g-3 mb-4">
+  <dl class="row g-2 mb-3">
     <div class="col-12 col-sm-8">
       <dt class="small text-body-secondary mb-1">Identyfikator wyniku</dt>
       <dd class="font-monospace small text-break mb-0">{{ result.id }}</dd>
@@ -19,89 +19,101 @@
       <dd class="fw-semibold mb-0">{{ result.records.length }}</dd>
     </div>
   </dl>
-  <div class="table-responsive">
-    <table class="table table-striped table-hover align-middle mb-0">
-      <caption class="visually-hidden">
-        Rekordy wyniku przetwarzania
-      </caption>
-      <thead class="table-light">
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Status</th>
-          <th scope="col">Przedmiot</th>
-          <th scope="col">Osoba</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (record of result.records; track $index) {
-          <tr>
-            <th scope="row" class="small font-monospace fw-normal text-break">{{ record.id }}</th>
-            <td>
-              <span
-                class="badge"
-                [class.text-bg-success]="record.status === 'VALID'"
-                [class.text-bg-danger]="record.status === 'INVALID'"
-                [class.text-bg-secondary]="record.status !== 'VALID' && record.status !== 'INVALID'"
-                >{{ record.status }}</span
-              >
-            </td>
-            <td class="text-break">{{ record.subject || '—' }}</td>
-            <td class="text-break">{{ record.preson || '—' }}</td>
-          </tr>
-          @if (record.optinalData; as data) {
-            <tr>
-              <td colspan="4" class="bg-body-tertiary">
-                <section [attr.aria-label]="'Dodatkowe dane rekordu ' + record.id">
-                  <h3 class="h6 text-secondary fw-semibold mb-0">Dodatkowe dane</h3>
-                  <dl class="row g-3 p-3 mb-0">
-                    <div class="col-12 col-sm-6 col-lg-4">
-                      <dt class="small text-body-secondary mb-1">Imię</dt>
+  <ol class="list-unstyled d-flex flex-column gap-2 mb-0" aria-label="Rekordy wyniku przetwarzania">
+    @for (record of result.records; track $index; let recordIndex = $index) {
+      <li>
+        <article class="card shadow-sm" [attr.aria-labelledby]="'record-title-' + recordIndex">
+          <header class="card-header p-2 px-sm-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-12 col-md-3">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  <h3 [id]="'record-title-' + recordIndex" class="small fw-semibold mb-0">Rekord {{ recordIndex + 1 }}</h3>
+                  <span
+                    class="badge"
+                    [class.text-bg-success]="record.status === 'VALID'"
+                    [class.text-bg-danger]="record.status === 'INVALID'"
+                    [class.text-bg-secondary]="record.status !== 'VALID' && record.status !== 'INVALID'"
+                    ><span class="visually-hidden">Status: </span>{{ record.status }}</span
+                  >
+                </div>
+                <p class="small text-body-secondary text-break mb-0">
+                  ID: <span class="font-monospace">{{ record.id }}</span>
+                </p>
+              </div>
+              <div class="col-12 col-md-9">
+                <dl class="row g-2 small mb-0">
+                  <div class="col-12 col-sm-7">
+                    <dt class="text-body-secondary mb-0">Przedmiot</dt>
+                    <dd class="fw-semibold text-break mb-0">{{ record.subject || '—' }}</dd>
+                  </div>
+                  <div class="col-12 col-sm-5">
+                    <dt class="text-body-secondary mb-0">Osoba</dt>
+                    <dd class="text-break mb-0">{{ record.preson || '—' }}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </header>
+          @if (record.warns.length || record.optinalData) {
+            <div class="card-body p-2 px-sm-3">
+              @if (record.warns.length) {
+                <section
+                  class="bg-warning-subtle border border-warning-subtle rounded px-2 py-1"
+                  [attr.aria-label]="'Ostrzeżenia rekordu ' + record.id"
+                >
+                  <h4 class="small fw-semibold text-warning-emphasis mb-1">Ostrzeżenia ({{ record.warns.length }})</h4>
+                  <ul class="list-unstyled small text-warning-emphasis mb-0">
+                    @for (warning of record.warns; track $index) {
+                      <li class="border-top border-warning-subtle text-break py-1">
+                        {{ warning }}
+                      </li>
+                    }
+                  </ul>
+                </section>
+              }
+              @if (record.optinalData; as data) {
+                <section
+                  [class]="record.warns.length ? 'border-top mt-2 pt-2' : ''"
+                  [attr.aria-label]="'Dodatkowe dane rekordu ' + record.id"
+                >
+                  <h4 class="small fw-semibold mb-1">Dodatkowe dane</h4>
+                  <dl class="d-flex flex-wrap column-gap-4 row-gap-1 small mb-0">
+                    <div class="d-flex flex-wrap gap-1">
+                      <dt class="text-body-secondary mb-0">Imię:</dt>
                       <dd class="mb-0 text-break">{{ data.firstName || '—' }}</dd>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
-                      <dt class="small text-body-secondary mb-1">Nazwisko</dt>
+                    <div class="d-flex flex-wrap gap-1">
+                      <dt class="text-body-secondary mb-0">Nazwisko:</dt>
                       <dd class="mb-0 text-break">{{ data.lastName || '—' }}</dd>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
-                      <dt class="small text-body-secondary mb-1">Nazwisko (surname)</dt>
+                    <div class="d-flex flex-wrap gap-1">
+                      <dt class="text-body-secondary mb-0">Nazwisko (surname):</dt>
                       <dd class="mb-0 text-break">{{ data.surname || '—' }}</dd>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
-                      <dt class="small text-body-secondary mb-1">Wiek</dt>
+                    <div class="d-flex flex-wrap gap-1">
+                      <dt class="text-body-secondary mb-0">Wiek:</dt>
                       <dd class="mb-0">{{ data.age }}</dd>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
-                      <dt class="small text-body-secondary mb-1">Miasto</dt>
+                    <div class="d-flex flex-wrap gap-1">
+                      <dt class="text-body-secondary mb-0">Miasto:</dt>
                       <dd class="mb-0 text-break">{{ data.city || '—' }}</dd>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
-                      <dt class="small text-body-secondary mb-1">Kod pocztowy</dt>
+                    <div class="d-flex flex-wrap gap-1">
+                      <dt class="text-body-secondary mb-0">Kod pocztowy:</dt>
                       <dd class="mb-0 text-break">{{ data.postalCode || '—' }}</dd>
                     </div>
                   </dl>
                 </section>
-              </td>
-            </tr>
+              }
+            </div>
           }
-        } @empty {
-          <tr>
-            <td colspan="4" class="text-center text-body-secondary py-4">Brak rekordów.</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  @if (result.warns.length) {
-    <div class="alert alert-warning mt-3 mb-0" role="status">
-      <h3 class="h6">Ostrzeżenia ({{ result.warns.length }})</h3>
-      <ul class="mb-0 ps-3">
-        @for (warning of result.warns; track $index) {
-          <li class="text-break">{{ warning }}</li>
-        }
-      </ul>
-    </div>
-  }
-  <div class="d-flex justify-content-end gap-2 flex-wrap mt-4" aria-label="Pliki do pobrania">
+        </article>
+      </li>
+    } @empty {
+      <li class="border rounded text-center text-body-secondary p-2">Brak rekordów.</li>
+    }
+  </ol>
+  <div class="d-flex justify-content-end gap-2 flex-wrap mt-3" aria-label="Pliki do pobrania">
     @for (download of downloads(); track download.url) {
       <a
         class="btn btn-secondary text-break mw-100"

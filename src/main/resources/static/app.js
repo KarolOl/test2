@@ -7,7 +7,6 @@ const submitLoader = document.querySelector("#submitLoader");
 const responseSection = document.querySelector("#response");
 const resultId = document.querySelector("#resultId");
 const overallStatus = document.querySelector("#overallStatus");
-const warnings = document.querySelector("#warnings");
 const records = document.querySelector("#records");
 const downloadLinks = document.querySelector("#downloadLinks");
 const errorBox = document.querySelector("#error");
@@ -59,7 +58,10 @@ form.addEventListener("submit", async (event) => {
         const jsonPart = parts.get("jsonResult");
         if (jsonPart === null) throw new Error("Brak części jsonResult w odpowiedzi.");
         const data = JSON.parse(typeof jsonPart === "string" ? jsonPart : await jsonPart.text());
-        if (!data || typeof data.id !== "string" || !["VALID", "INVALID"].includes(data.overallStatus) || !Array.isArray(data.warns) || !Array.isArray(data.records)) {
+        if (!data || typeof data.id !== "string" || !["VALID", "INVALID"].includes(data.overallStatus) || !Array.isArray(data.records) || !data.records.every(
+            (record) => record && ["id", "status", "subject", "preson"].every((key) => typeof record[key] === "string")
+                && Array.isArray(record.warns) && record.warns.every((warning) => typeof warning === "string")
+        )) {
             throw new Error("Nieprawidłowa struktura części jsonResult.");
         }
         const firstPdfFile = parts.get("firstPdfFile");
@@ -210,28 +212,62 @@ function renderResult(data) {
     resultId.textContent = data.id;
     overallStatus.textContent = data.overallStatus;
     overallStatus.className = data.overallStatus === "VALID" ? "status-valid" : "status-invalid";
-    warnings.replaceChildren();
-    for (const warning of data.warns) {
-        const item = document.createElement("li");
-        item.textContent = warning;
-        warnings.append(item);
-    }
     records.replaceChildren();
-    for (const record of data.records) {
-        const row = document.createElement("tr");
-        for (const key of ["id", "status", "subject", "preson"]) {
-            const cell = document.createElement("td");
-            cell.textContent = record[key] || "—";
-            row.append(cell);
+    for (const [index, record] of data.records.entries()) {
+        const item = document.createElement("li");
+        const card = document.createElement("article");
+        card.className = "record-card";
+        card.setAttribute("aria-labelledby", `record-title-${index}`);
+        const header = document.createElement("header");
+        header.className = "record-header";
+        const identity = document.createElement("div");
+        identity.className = "record-identity";
+        const title = document.createElement("h3");
+        title.id = `record-title-${index}`;
+        title.textContent = `Rekord ${index + 1}`;
+        const id = document.createElement("p");
+        id.className = "record-id";
+        id.textContent = `ID: ${record.id}`;
+        identity.append(title, id);
+        const status = document.createElement("span");
+        status.className = `record-status ${record.status === "VALID" ? "status-valid" : record.status === "INVALID" ? "status-invalid" : ""}`;
+        status.textContent = record.status;
+        status.setAttribute("aria-label", `Status: ${record.status}`);
+        header.append(identity, status);
+        const body = document.createElement("div");
+        body.className = "record-body";
+        const mainFields = document.createElement("dl");
+        mainFields.className = "record-main-fields";
+        for (const [key, label] of [["subject", "Przedmiot"], ["preson", "Osoba"]]) {
+            const field = document.createElement("div");
+            const name = document.createElement("dt");
+            const value = document.createElement("dd");
+            name.textContent = label;
+            value.textContent = record[key] || "—";
+            field.append(name, value);
+            mainFields.append(field);
         }
-        records.append(row);
+        header.append(mainFields);
+        if (record.warns.length) {
+            const warningSection = document.createElement("section");
+            warningSection.className = "record-warnings";
+            warningSection.setAttribute("aria-label", `Ostrzeżenia rekordu ${record.id}`);
+            const heading = document.createElement("h4");
+            heading.textContent = `Ostrzeżenia (${record.warns.length})`;
+            const list = document.createElement("ul");
+            for (const warning of record.warns) {
+                const item = document.createElement("li");
+                item.textContent = warning;
+                list.append(item);
+            }
+            warningSection.append(heading, list);
+            body.append(warningSection);
+        }
         if (record.optinalData && typeof record.optinalData === "object") {
-            const detailRow = document.createElement("tr");
-            const detailCell = document.createElement("td");
-            detailCell.colSpan = 4;
             const additionalData = document.createElement("section");
+            additionalData.className = "record-additional-data";
             additionalData.setAttribute("aria-label", `Dodatkowe dane rekordu ${record.id}`);
-            const heading = document.createElement("h3");
+            const heading = document.createElement("h4");
             heading.textContent = "Dodatkowe dane";
             const fields = document.createElement("dl");
             fields.className = "record-details";
@@ -239,24 +275,24 @@ function renderResult(data) {
                 const field = document.createElement("div");
                 const title = document.createElement("dt");
                 const value = document.createElement("dd");
-                title.textContent = label;
+                title.textContent = `${label}:`;
                 value.textContent = record.optinalData[key] ?? "—";
                 field.append(title, value);
                 fields.append(field);
             }
             additionalData.append(heading, fields);
-            detailCell.append(additionalData);
-            detailRow.append(detailCell);
-            records.append(detailRow);
+            body.append(additionalData);
         }
+        card.append(header);
+        if (body.hasChildNodes()) card.append(body);
+        item.append(card);
+        records.append(item);
     }
     if (!data.records.length) {
-        const row = document.createElement("tr");
-        const cell = document.createElement("td");
-        cell.colSpan = 4;
-        cell.textContent = "Brak rekordów.";
-        row.append(cell);
-        records.append(row);
+        const item = document.createElement("li");
+        item.className = "record-empty";
+        item.textContent = "Brak rekordów.";
+        records.append(item);
     }
 }
 

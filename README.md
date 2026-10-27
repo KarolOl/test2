@@ -43,21 +43,25 @@ Przykładowa zawartość części `jsonResult`:
 {
   "id": "identyfikator-wyniku",
   "overallStatus": "VALID",
-  "warns": [
-    "Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentów."
-  ],
   "records": [
     {
       "id": "record-1",
       "status": "VALID",
       "subject": "Przykładowy dokument",
-      "preson": "Przykładowa osoba"
+      "preson": "Przykładowa osoba",
+      "warns": [
+        "Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentu."
+      ]
     },
     {
       "id": "record-2",
       "status": "VALID",
       "subject": "Dokument z dodatkowymi danymi",
       "preson": "Anna Kowalska",
+      "warns": [
+        "Wynik demonstracyjny - nie przeprowadzono weryfikacji dokumentu.",
+        "Dodatkowe dane osoby są przykładowe i wymagają potwierdzenia."
+      ],
       "optinalData": {
         "firstName": "Anna",
         "lastName": "Kowalska",
@@ -73,7 +77,9 @@ Przykładowa zawartość części `jsonResult`:
 
 `overallStatus` przyjmuje `VALID` lub `INVALID`. Pisownia `preson` jest częścią kontraktu API.
 
-`optinalData` jest opcjonalnym obiektem rekordu (pisownia zgodna z kontraktem). Pierwszy przykładowy rekord nie zawiera tego pola, a drugi zawiera komplet dodatkowych danych. `age` jest nieujemną liczbą całkowitą; pozostałe pola są tekstowe, również `postalCode`, aby zachować zera na początku. Frontend akceptuje pominięte `optinalData` lub `null`; dla obecnego obiektu pokazuje stale otwartą sekcję „Dodatkowe dane” pod odpowiednim wierszem tabeli.
+Każdy element `records` zawiera wymaganą listę tekstów `warns`. Brak ostrzeżeń oznacza pustą listę `[]`. Pole nie występuje na głównym poziomie odpowiedzi. Frontend pokazuje ostrzeżenia w żółtym bloku „Ostrzeżenia (N)” wewnątrz osobnej karty rekordu, przed dodatkowymi danymi. Poszczególne komunikaty są oddzielone liniami. Pełna lista jest stale widoczna; dla pustej listy blok nie jest wyświetlany. Ostrzeżenia nie zmieniają prezentowanego statusu rekordu.
+
+`optinalData` jest opcjonalnym obiektem rekordu (pisownia zgodna z kontraktem). Pierwszy przykładowy rekord nie zawiera tego pola, a drugi zawiera komplet dodatkowych danych. `age` jest nieujemną liczbą całkowitą; pozostałe pola są tekstowe, również `postalCode`, aby zachować zera na początku. Frontend akceptuje pominięte `optinalData` lub `null`; dla obecnego obiektu pokazuje stale otwartą sekcję „Dodatkowe dane” w karcie odpowiedniego rekordu. Rekordy są prezentowane jako osobne, ponumerowane karty z obramowaniem i odstępami. Kompaktowy nagłówek zawiera numer, ID, status, przedmiot i osobę; poniżej znajdują się sekcje ostrzeżeń i dodatkowych danych z małymi odstępami. Dodatkowe pola mają układ etykieta–wartość i zawijają się zależnie od szerokości ekranu.
 
 Pliki wyjściowe są niezależne od uploadu, również od obecności opcjonalnego wejściowego `secondFile`. Backend demonstracyjny zawsze zwraca własny przykładowy PDF jako `firstPdfFile` z nazwą `raport.pdf`. Nie wykonuje rzeczywistej weryfikacji dokumentów; wynik i rekordy są przykładowe.
 
